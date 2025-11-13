@@ -155,6 +155,20 @@ app.patch('/food-requests/:requestId', async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 });
+
+
+// GET - Get all food requests by requester email
+app.get('/my-food-requests/:email', async (req, res) => {
+    try {
+        const email = req.params.email;
+        const query = { requesterEmail: email };
+        const cursor = foodRequestsCollection.find(query);
+        const result = await cursor.toArray();
+        res.send(result);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
     
     
     // Send a ping to confirm a successful connection
