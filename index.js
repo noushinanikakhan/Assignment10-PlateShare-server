@@ -34,6 +34,7 @@ async function run() {
    
     const db= client.db('plateshare')
     const foodsCollection = db.collection('foods');
+    const foodRequestsCollection = db.collection('foodRequests'); // ADD THIS LINE
 
     app.post('/foods', async(req, res)=> {
         const newFood = req.body;
@@ -106,6 +107,54 @@ async function run() {
             res.status(500).json({ message: error.message });
         }
     })
+
+
+    // FOOD REQUEST ENDPOINTS
+
+// POST - Create new food request
+app.post('/food-requests', async (req, res) => {
+    try {
+        const newRequest = req.body;
+        const result = await foodRequestsCollection.insertOne(newRequest);
+        res.send(result);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
+// GET - Get all requests for a specific food
+app.get('/food-requests/:foodId', async (req, res) => {
+    try {
+        const foodId = req.params.foodId;
+        const query = { foodId: foodId };
+        const cursor = foodRequestsCollection.find(query);
+        const result = await cursor.toArray();
+        res.send(result);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
+// PATCH - Update request status (accept/reject)
+app.patch('/food-requests/:requestId', async (req, res) => {
+    try {
+        const requestId = req.params.requestId;
+        const { status } = req.body;
+        const query = { _id: new ObjectId(requestId) };
+        
+        const updateDoc = {
+            $set: { 
+                status: status,
+                processedAt: new Date()
+            }
+        };
+        
+        const result = await foodRequestsCollection.updateOne(query, updateDoc);
+        res.send(result);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
     
     
     // Send a ping to confirm a successful connection
