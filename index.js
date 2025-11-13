@@ -151,19 +151,15 @@ app.get('/my-food-requests/:email', async (req, res) => {
     }
 });
     
-    
-    // Send a ping to confirm a successful connection
-    await client.db("admin").command({ ping: 1 });
-    console.log("Pinged your deployment. You successfully connected to MongoDB!");
-  } finally {
-    // Ensures that the client will close when you finish/error
-    // await client.close();
+ console.log("Connected to MongoDB and routes are set up!");
+
+  } catch (error) {
+    console.error("MongoDB connection error:", error);
   }
 }
 
+// Initialize the database connection and routes
 run().catch(console.dir);
 
-app.listen(port, () => {
-  console.log(`Plateshare is running on port ${port}`)
-})
-
+// VERCEL REQUIREMENT: Export the app for serverless functions
+module.exports = app;
